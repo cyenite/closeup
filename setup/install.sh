@@ -2,8 +2,9 @@
 # Installs Closeup for the current user. Run from a source checkout or an
 # unpacked release archive.
 #
-#   setup/install.sh          everything (asks for sudo once for the system part)
-#   setup/install.sh --user   only the per-user part: app, desktop entry, extension
+#   setup/install.sh                 everything; asks before granting keyboard access
+#   setup/install.sh --input-group   the same, granting keyboard access without asking
+#   setup/install.sh --user          only the per-user part: app, desktop entry, extension
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -12,14 +13,16 @@ bin_dir="$HOME/.local/bin"
 data_dir="${XDG_DATA_HOME:-$HOME/.local/share}"
 extensions="$data_dir/gnome-shell/extensions"
 user_only=false
+grant_input=ask
 needs_relogin=false
 needs_reboot=false
 
 for arg in "$@"; do
     case "$arg" in
         --user) user_only=true ;;
+        --input-group) grant_input=yes ;;
         -h | --help)
-            sed -n '2,6p' "$0" | sed 's/^# \{0,1\}//'
+            sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'
             exit 0
             ;;
         *)
@@ -41,6 +44,28 @@ install_build_dependencies() {
     else
         echo "Unknown package manager: install the PipeWire development headers, clang and pkg-config yourself."
     fi
+}
+
+# Bare-digit zoom reads raw keyboard input, which only the 'input' group
+# allows, and that group lets every program you run read keystrokes. Ask
+# rather than assume; everything else works without it.
+wants_keyboard_access() {
+    if id -nG "$USER" 2>/dev/null | tr ' ' '\n' | grep -qx input || getent group input | grep -qw "$USER"; then
+        return 0
+    fi
+    if [ "$grant_input" = yes ]; then
+        return 0
+    fi
+    if [ ! -t 0 ]; then
+        echo "Skipping keyboard access (not interactive); rerun with --input-group to grant it."
+        return 1
+    fi
+    echo "Bare-digit zoom (1-9 without Ctrl+Alt) needs you in the 'input' group."
+    echo "That group lets ANY program you run read raw keyboard input, passwords included."
+    echo "Without it, Ctrl+Alt+1-9 and keys typed into the Stage window still zoom."
+    local answer
+    read -r -p "Join the 'input' group? [y/N] " answer
+    [[ "$answer" =~ ^[Yy]$ ]]
 }
 
 install_keyboard_access() {
@@ -90,7 +115,11 @@ if ! $user_only; then
     step "Build dependencies"
     install_build_dependencies
     step "Keyboard access for bare-digit zoom (input group, uinput)"
-    install_keyboard_access
+    if wants_keyboard_access; then
+        install_keyboard_access
+    else
+        echo "Skipped: use Ctrl+Alt+1-9, or rerun with --input-group later."
+    fi
 fi
 
 step "Closeup app"

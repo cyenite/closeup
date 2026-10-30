@@ -40,4 +40,7 @@ if $system; then
     sudo gpasswd -d "$USER" input || true
 fi
 
+if ! $system && getent group input | grep -qw "$USER"; then
+    echo "You are still in the 'input' group; rerun with --system to leave it."
+fi
 echo "Closeup removed. Log out and back in to unload the extension."

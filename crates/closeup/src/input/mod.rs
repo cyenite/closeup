@@ -1,5 +1,6 @@
 mod focus;
 mod router;
+mod session;
 
 use std::collections::HashSet;
 use std::io::ErrorKind;
@@ -30,6 +31,7 @@ pub type ActionSink = Arc<dyn Fn(Action) + Send + Sync>;
 pub struct InputHandle {
     sink: ActionSink,
     paused: watch::Sender<bool>,
+    is_live: watch::Sender<bool>,
     has_shell_shortcuts: Arc<AtomicBool>,
 }
 
@@ -61,8 +63,12 @@ impl InputHandle {
 /// event is replayed through a uinput keyboard, except bare digits pressed
 /// while the presenter is not typing: those drive the zoom instead.
 pub fn spawn(sink: ActionSink) -> InputHandle {
-    let handle =
-        InputHandle { sink, paused: watch::channel(false).0, has_shell_shortcuts: Arc::new(AtomicBool::new(false)) };
+    let handle = InputHandle {
+        sink,
+        paused: watch::channel(false).0,
+        is_live: watch::channel(true).0,
+        has_shell_shortcuts: Arc::new(AtomicBool::new(false)),
+    };
     let input = handle.clone();
     thread::Builder::new()
         .name("input".into())
@@ -82,6 +88,7 @@ async fn run(input: InputHandle) {
     if passthrough.is_none() {
         log::warn!("/dev/uinput is not writable: bare digits stay with apps, Ctrl+Alt shortcuts still zoom");
     }
+    tokio::spawn(session::watch(input.is_live.clone()));
     let focus = Arc::new(FocusProbe::connect().await);
     let active: Arc<Mutex<HashSet<PathBuf>>> = Arc::default();
     let mut access = None;
@@ -231,10 +238,12 @@ impl Keyboard {
     async fn run(self, device: Device) -> Result<()> {
         let mut stream = device.into_event_stream().context("open event stream")?;
         let mut changes = self.input.paused.subscribe();
+        let mut liveness = self.input.is_live.subscribe();
         let mut router = KeyRouter::default();
         let mut is_grabbed = false;
         loop {
-            let wants_grab = !*changes.borrow() && self.passthrough.is_some();
+            let is_live = *liveness.borrow();
+            let wants_grab = is_live && !*changes.borrow() && self.passthrough.is_some();
             // Switching only with no keys down keeps press/release pairs on
             // one device; libinput drops releases it never saw pressed,
             // which would leave a key stuck. At startup the router has not
@@ -251,6 +260,7 @@ impl Keyboard {
             }
             tokio::select! {
                 changed = changes.changed() => changed?,
+                changed = liveness.changed() => changed?,
                 event = stream.next_event() => {
                     let event = event?;
                     if let EventSummary::Key(_, key, value) = event.destructure() {
@@ -263,7 +273,7 @@ impl Keyboard {
                             has_shell_shortcuts: self.input.has_shell_shortcuts.load(Ordering::Relaxed),
                         };
                         let (verdict, action) = router.handle(key, value, context);
-                        if let Some(action) = action {
+                        if let Some(action) = action.filter(|_| is_live) {
                             self.input.dispatch(action);
                         }
                         if is_grabbed && verdict == Verdict::Forward {

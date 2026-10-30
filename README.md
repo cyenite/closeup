@@ -46,7 +46,7 @@ From source:
 git clone https://github.com/cyenite/closeup && cd closeup && setup/install.sh
 ```
 
-`setup/install.sh` asks for `sudo` once. It installs the build dependencies, adds the uinput rule, and adds you to the `input` group. It then installs the app to `~/.local/bin`, a desktop entry, and the GNOME Shell extension. Run it with `--user` to skip the system part (bare digits then only zoom while the Stage window has focus).
+`setup/install.sh` installs the build dependencies, then the app to `~/.local/bin`, a desktop entry, and the GNOME Shell extension. For bare-digit zoom it also needs you in the `input` group (see [Privacy and security](#privacy-and-security)); it **asks first**, and `--input-group` grants it without asking. Run it with `--user` to skip everything that needs `sudo`. Without the group, `Ctrl+Alt+1`-`9` and keys typed into the Stage window still zoom.
 
 **Then log out and back in.** GNOME loads extension code and new group memberships only at login. If the installer says *reboot*, do that instead: with systemd lingering enabled, your user session outlives logouts and keeps its old groups.
 
@@ -145,7 +145,9 @@ Run `closeup -v` for detailed logs, including Stage and source frame rates.
 
 Closeup makes no network connections. It reads your screen only through the portal source you pick.
 
-Bare-digit zoom needs the `input` group, and that group lets *any* program you run read raw keyboard input. If that's not acceptable on your machine, install with `setup/install.sh --user`. The `Ctrl+Alt` shortcuts and the Stage-window keys keep working without it.
+Bare-digit zoom needs the `input` group, and that group lets *any* program you run read raw keyboard input. The installer asks before adding you. If that's not acceptable on your machine, answer no (or use `--user`): the `Ctrl+Alt` shortcuts and the Stage-window keys keep working without it. `setup/uninstall.sh --system` removes the membership again.
+
+While it runs, Closeup follows your login session. When the screen locks or another user's session takes over the seat, it releases the keyboards and acts on no keys until you're back. Lock-screen passwords and other users' typing then go straight to the system, not through Closeup's replay. Like anything in the `input` group, it still receives the raw events while you're away; it ignores them.
 
 ## Known limitations
 
