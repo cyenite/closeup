@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Closeup
+GenericName=Live zoom for screen sharing
+Comment=Share the Closeup Stage window, then press 1-9 to zoom the audience's view
+Exec=closeup
+Icon=closeup
+Terminal=false
+Categories=AudioVideo;Video;
+Keywords=zoom;presentation;screen share;screencast;meeting;magnifier;
+StartupWMClass=closeup-stage

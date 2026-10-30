@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: System libraries
+        run: sudo apt-get update && sudo apt-get install -y libpipewire-0.3-dev libspa-0.2-dev clang pkg-config libxkbcommon-dev libwayland-dev
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo build --release --locked -p closeup
+      - name: Package
+        run: |
+          name="closeup-${GITHUB_REF_NAME}-x86_64-linux"
+          mkdir -p "$name/bin"
+          cp target/release/closeup "$name/bin/"
+          cp -r gnome-extension packaging setup README.md config.example.toml "$name/"
+          tar czf "$name.tar.gz" "$name"
+          sha256sum "$name.tar.gz" > "$name.tar.gz.sha256"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: closeup-*-x86_64-linux.tar.gz*
+          generate_release_notes: true

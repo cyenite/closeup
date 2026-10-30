@@ -1,0 +1,61 @@
+.closeup-edge {
+  background-color: rgba(255, 196, 0, 0.95);
+  border-radius: 2px;
+}
+
+.closeup-strip {
+  background-color: rgba(18, 18, 20, 0.9);
+  border: 1px solid rgba(255, 196, 0, 0.55);
+  border-radius: 10px;
+  padding: 6px 10px;
+  spacing: 8px;
+  font-size: 12px;
+  color: #e8e8ea;
+}
+
+.closeup-levels {
+  spacing: 3px;
+}
+
+.closeup-zoom {
+  color: #ffc400;
+  font-weight: bold;
+  font-size: 14px;
+  min-width: 40px;
+}
+
+.closeup-hint {
+  color: #a0a0a8;
+}
+
+.closeup-chip {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+
+.closeup-level {
+  font-weight: bold;
+  min-width: 10px;
+  text-align: center;
+}
+
+.closeup-active {
+  background-color: #ffc400;
+  color: #121214;
+  font-weight: bold;
+}
+
+.closeup-warning {
+  color: #ff8a65;
+  font-weight: bold;
+}
+
+.closeup-panel {
+  font-weight: bold;
+}
+
+.closeup-panel.closeup-active {
+  background-color: transparent;
+  color: #ffc400;
+}

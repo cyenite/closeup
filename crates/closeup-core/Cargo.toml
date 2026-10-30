@@ -1,0 +1,9 @@
+[package]
+name = "closeup-core"
+description = "Camera controller for Closeup: zoom levels, cursor-anchored zoom, dead-zone follow, springs."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]

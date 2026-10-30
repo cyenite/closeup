@@ -1,0 +1,18 @@
+# Copy to ~/.config/closeup/config.toml. Every key is optional.
+
+# Zoom factor for keys 1..9 (1 is the whole source).
+levels = [1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
+
+# Stage render rate.
+fps = 60
+
+# Spring stiffness: higher is snappier. Panning is kept calmer than zooming
+# because meeting encoders blur constant motion.
+pan_omega = 7.0
+zoom_omega = 13.0
+
+# Fraction of the zoomed view the cursor can roam before the view pans.
+dead_zone = 0.7
+
+# Cursor size relative to its size at 1x.
+cursor_scale = 1.0

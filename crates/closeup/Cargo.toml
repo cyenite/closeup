@@ -1,0 +1,31 @@
+[package]
+name = "closeup"
+description = "Live zoom for screen sharing on Linux."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+anyhow = "1.0.104"
+ashpd = { version = "0.13.13", features = ["raw_handle", "screencast", "wayland"] }
+bytemuck = { version = "1.25.2", features = ["derive"] }
+clap = { version = "4.6.7", features = ["derive"] }
+closeup-core = { version = "0.1.0", path = "../closeup-core" }
+dirs = "7.0.0"
+env_logger = "0.11.11"
+evdev = { version = "0.13.2", features = ["tokio"] }
+futures-util = { version = "0.3.34", default-features = false }
+log = "0.4.34"
+pipewire = "0.10.1"
+pollster = "1.0.1"
+serde = { version = "1.0.229", features = ["derive"] }
+tokio = { version = "1.54.1", features = ["rt", "rt-multi-thread", "macros", "sync", "time"] }
+toml = "1.1.8"
+wgpu = "30.0.1"
+winit = "0.30.13"
+zbus = { version = "5", default-features = false, features = ["tokio"] }
+
+[dev-dependencies]
+png = "0.18.1"
+serde_json = "1.0.154"

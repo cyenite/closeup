@@ -1,0 +1,8 @@
+{
+  "uuid": "closeup@closeup.app",
+  "name": "Closeup Overlay",
+  "description": "Companion to the Closeup app: draws the zoom outline and controls on the presenter's screen, detects typing, and owns Closeup's Ctrl+Alt shortcuts.",
+  "url": "https://github.com/cyenite/closeup",
+  "shell-version": ["46", "47", "48", "49", "50"],
+  "version": 2
+}
