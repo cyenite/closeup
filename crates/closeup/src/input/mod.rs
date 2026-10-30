@@ -66,7 +66,7 @@ pub fn spawn(sink: ActionSink) -> InputHandle {
     let handle = InputHandle {
         sink,
         paused: watch::channel(false).0,
-        is_live: watch::channel(true).0,
+        is_live: watch::channel(false).0,
         has_shell_shortcuts: Arc::new(AtomicBool::new(false)),
     };
     let input = handle.clone();

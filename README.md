@@ -147,7 +147,7 @@ Closeup makes no network connections. It reads your screen only through the port
 
 Bare-digit zoom needs the `input` group, and that group lets *any* program you run read raw keyboard input. The installer asks before adding you. If that's not acceptable on your machine, answer no (or use `--user`): the `Ctrl+Alt` shortcuts and the Stage-window keys keep working without it. `setup/uninstall.sh --system` removes the membership again.
 
-While it runs, Closeup follows your login session. When the screen locks or another user's session takes over the seat, it releases the keyboards and acts on no keys until you're back. Lock-screen passwords and other users' typing then go straight to the system, not through Closeup's replay. Like anything in the `input` group, it still receives the raw events while you're away; it ignores them.
+While it runs, Closeup follows your login session. When the screen locks or another user's session takes over the seat, it releases the keyboards and acts on no keys until you're back. Lock-screen passwords and other users' typing then go straight to the system, not through Closeup's replay. Like anything in the `input` group, it still receives the raw events while you're away; it ignores them. If it can't tell whether your session is active (no systemd-logind or elogind), it keeps the keyboards released: bare digits stay off, while the `Ctrl+Alt` shortcuts and the Stage-window keys keep working.
 
 ## Known limitations
 
